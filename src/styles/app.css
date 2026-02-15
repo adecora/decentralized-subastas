@@ -1,0 +1,29 @@
+footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+
+  & a svg {
+    position: relative;
+    top: 4px;
+    height: 1.25em;
+  }
+}
+
+@media (max-width: 1024px) {
+  footer {
+    z-index: -1;
+    position: relative;
+    margin: 0;
+    padding: 2em 0;
+  }
+}
+
+@media (max-width: 540px) {
+  footer {
+    padding: 0 0 2em 0;
+  }
+}
