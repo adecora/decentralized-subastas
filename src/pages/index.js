@@ -4,8 +4,12 @@ import { Contract, ethers } from "ethers"
 import { useEffect, useRef, useState } from "react"
 import AuctionSystemManifest from "../../contracts/AuctionSystem.json"
 
+import Alert from "react-bootstrap/Alert"
+import AuctionList from "@/components/AuctionList"
+
 export default function Home() {
-  const [autions, setAuctions] = useState([])
+  const [auctions, setAuctions] = useState([])
+  const [error, setError] = useState(null)
   const [auctionDescription, setAuctionDescription] = useState("")
   const [auctionTimeToLive, setAuctionTimeToLive] = useState(1)
 
@@ -68,13 +72,13 @@ export default function Home() {
           auctionId: auction[0].toNumber(),
           creator: auction[1].toString(),
           description: auction[2],
-          deadline: auction[3].toString(),
+          deadline: auction[3].toNumber(),
           highestBidder: auction[4].toString(),
           highestBid: ethers.utils.formatEther(auction[5]),
         })
       }
 
-      console.log(_auctions)
+      setAuctions(_auctions)
     } catch (err) {
       const { error } = decodeError(err)
       alert(`Revert operation: ${error}`)
@@ -87,43 +91,74 @@ export default function Home() {
         auctionDescription,
         auctionTimeToLive,
       )
-      await tx.wait()
+      const response = await tx.wait()
+      console.log(response)
+      await getAuctions()
     } catch (err) {
       const { error } = decodeError(err)
-      alert(`Revert operation: ${error}`)
+      console.error(`Revert operation: ${error}`)
+      setError(`Revert operation: ${error}`)
+    } finally {
+      setAuctionDescription("")
+      setAuctionTimeToLive(1)
     }
-    setAuctionDescription("")
-    setAuctionTimeToLive(1)
+  }
+
+  async function bid(auctionId) {
+    alert(`Bid on ${auctionId}`)
+  }
+
+  async function refund(auctionId) {
+    alert(`Refund on ${auctionId}`)
+  }
+
+  async function getWinner(auctionId) {
+    alert(`GetWinner on ${auctionId}`)
   }
 
   return (
     <>
       <h1>Subastas</h1>
-      <div>{auctionDescription}</div>
-      <input
-        type="text"
-        value={auctionDescription}
-        onChange={(e) => {
-          setAuctionDescription(e.target.value)
-        }}
+
+      {error && (
+        <Alert variant="danger" dismissible onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      <div>
+        <input
+          type="text"
+          value={auctionDescription}
+          onChange={(e) => {
+            setAuctionDescription(e.target.value)
+          }}
+        />
+        <input
+          type="number"
+          value={auctionTimeToLive}
+          min={1}
+          max={10080}
+          step={5}
+          onChange={(e) => {
+            setAuctionTimeToLive(e.target.value)
+          }}
+        />
+        <button
+          onClick={() => {
+            createAuction()
+          }}
+        >
+          Crear subasta
+        </button>
+      </div>
+
+      <AuctionList
+        auctions={auctions}
+        onBind={bid}
+        onRefund={refund}
+        onViewWinner={getWinner}
       />
-      <input
-        type="number"
-        value={auctionTimeToLive}
-        min={1}
-        max={10080}
-        step={5}
-        onChange={(e) => {
-          setAuctionTimeToLive(e.target.value)
-        }}
-      />
-      <button
-        onClick={() => {
-          createAuction()
-        }}
-      >
-        Crear subasta
-      </button>
     </>
   )
 }
