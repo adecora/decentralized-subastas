@@ -4,6 +4,9 @@ import { useBlockchain } from "@/context/BlockchainContext"
 import { useRouter } from "next/router"
 
 import Alert from "react-bootstrap/Alert"
+import Button from "react-bootstrap/Button"
+import Card from "react-bootstrap/Card"
+import Form from "react-bootstrap/Form"
 import Spinner from "react-bootstrap/Spinner"
 
 export default function CreateAuction() {
@@ -40,7 +43,7 @@ export default function CreateAuction() {
       const auctionId = event.args.auctionId.toNumber()
       setSuccess(`¡Subasta creada exitosamente! ID: ${auctionId}`)
 
-      // 2 segundito para redirigir a la página principal
+      // 2 segunditos para redirigir a la página principal
       setTimeout(() => {
         router.push("/")
       }, 2000)
@@ -67,92 +70,126 @@ export default function CreateAuction() {
   }
 
   return (
-    <>
+    <div>
       <h1 className="mb-4">Crear Nueva Subasta</h1>
 
-      {error && (
-        <Alert variant="danger" dismissible onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      <div className="row justify-content-center">
+        <div className="col-md-8 col-lg-6">
+          <Card>
+            <Card.Body>
+              <Card.Title>Información de la Subasta</Card.Title>
+              <Card.Text className="text-muted mb-4">
+                Completa los datos para crear una nueva subasta en la
+                blockchain.
+              </Card.Text>
 
-      {success && (
-        <Alert variant="success">
-          {success}
-          <br />
-          <small>Redirigiendo a la página principal...</small>
-        </Alert>
-      )}
+              {error && (
+                <Alert
+                  variant="danger"
+                  dismissible
+                  onClose={() => setError(null)}
+                >
+                  {error}
+                </Alert>
+              )}
 
-      <div className="card">
-        <div className="card-body">
-          <div className="mb-3">
-            <label htmlFor="description" className="form-label">
-              Descripción de la subasta
-            </label>
-            <input
-              id="description"
-              type="text"
-              className="form-control"
-              placeholder="Ej: iPhone 15 Pro Max"
-              value={auctionDescription}
-              onChange={(e) => setAuctionDescription(e.target.value)}
-              disabled={creating}
-            />
-          </div>
+              {success && (
+                <Alert variant="success">
+                  {success}
+                  <br />
+                  <small>Redirigiendo a la página principal...</small>
+                </Alert>
+              )}
 
-          <div className="mb-3">
-            <label htmlFor="timeToLive" className="form-label">
-              Duración (minutos)
-            </label>
-            <input
-              id="timeToLive"
-              type="number"
-              className="form-control"
-              value={auctionTimeToLive}
-              min={1}
-              max={10080}
-              step={5}
-              onChange={(e) => setAuctionTimeToLive(Number(e.target.value))}
-              disabled={creating}
-            />
-            <div className="form-text">
-              Mínimo: 1 minuto | Máximo: 10,080 minutos (1 semana)
-            </div>
-          </div>
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  createAuction()
+                }}
+              >
+                <Form.Group className="mb-3">
+                  <Form.Label>Descripción de la subasta *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Ej: Framework laptop 12"
+                    value={auctionDescription}
+                    onChange={(e) => setAuctionDescription(e.target.value)}
+                    disabled={creating}
+                    required
+                    maxLength={100}
+                  />
+                  <Form.Text className="text-muted">
+                    Descripción de la subasta
+                  </Form.Text>
+                </Form.Group>
 
-          <Alert variant="info" className="small">
-            <strong>ℹ️ Información importante:</strong>
-            <ul className="mb-0 mt-2">
-              <li>La puja mínima será de 0.001 BNB</li>
-              <li>Cada usuario solo puede pujar una vez</li>
-              <li>Los perdedores podrán solicitar reembolso al finalizar</li>
-              <li>La transacción requerirá confirmación en MetaMask</li>
-            </ul>
-          </Alert>
+                <Form.Group className="mb-4">
+                  <Form.Label>Duración (minutos) *</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Ej: 60"
+                    value={auctionTimeToLive}
+                    onChange={(e) => setAuctionTimeToLive(e.target.value)}
+                    disabled={creating}
+                    required
+                    min={1}
+                    max={10080}
+                    step={5}
+                  />
+                  <Form.Text className="text-muted">
+                    Mínimo: 1 minuto | Máximo: 10,080 minutos (1 semana)
+                  </Form.Text>
+                </Form.Group>
 
-          <button
-            className="btn btn-primary"
-            onClick={createAuction}
-            disabled={
-              creating || !auctionDescription.trim() || auctionTimeToLive < 1
-            }
-          >
-            {creating ? (
-              <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                Creando subasta...
-              </>
-            ) : (
-              "Crear Subasta"
-            )}
-          </button>
+                <Alert variant="info" className="small">
+                  <strong>ℹ️ Información importante:</strong>
+                  <ul className="mb-0 mt-2">
+                    <li>La puja mínima será de 0.01 BNB</li>
+                    <li>Cada usuario solo puede pujar una vez</li>
+                    <li>
+                      Los perdedores podrán solicitar reembolso al finalizar
+                    </li>
+                    <li>La transacción requerirá confirmación en MetaMask</li>
+                  </ul>
+                </Alert>
+
+                <div className="d-grid gap-2">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={creating}
+                    size="lg"
+                  >
+                    {creating ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-2"
+                        />
+                        Creando subasta...
+                      </>
+                    ) : (
+                      "Crear Subasta"
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => router.push("/")}
+                    disabled={creating}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </Form>
+            </Card.Body>
+          </Card>
         </div>
       </div>
-    </>
+    </div>
   )
 }

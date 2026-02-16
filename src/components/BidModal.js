@@ -20,8 +20,7 @@ export default function BidModal({ show, auction, onClose, onSubmit }) {
     Number(auction.highestBid || 0),
   )
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  async function bid() {
     setError(null)
 
     const bidAmount = Number(amount)
@@ -76,7 +75,12 @@ export default function BidModal({ show, auction, onClose, onSubmit }) {
           <strong>Puja mínima:</strong> {MIN_BID} BNB
         </Alert>
 
-        <Form onSubmit={handleSubmit}>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault()
+            bid()
+          }}
+        >
           <Form.Group className="mb-3">
             <Form.Label>Cantidad a pujar (BNB)</Form.Label>
             <Form.Control
