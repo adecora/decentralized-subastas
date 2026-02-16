@@ -12,7 +12,7 @@ export default function Layout({ children }) {
           name="description"
           content="Sistema descentralizado de subastas, desplegado en BSC Tesnet"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/blockchain_icon.svg" />
 
         {/* TODO: Imagenes para preview, url de despliegue en firebase */}
         <meta
