@@ -37,7 +37,7 @@ export function BlockchainProvider({ children }) {
         const signer = providerEthers.getSigner()
 
         const contract = new Contract(
-          "0xce13661d741acEfd756c3A9F996E17A97dC5291F",
+          "0x79d56F8f0866d8E42F4f3B2e0dd59e5B21c5960C",
           AuctionSystemManifest.abi,
           signer,
         )

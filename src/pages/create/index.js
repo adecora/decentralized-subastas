@@ -134,7 +134,7 @@ export default function CreateAuction() {
                     required
                     min={1}
                     max={10080}
-                    step={5}
+                    step={1}
                   />
                   <Form.Text className="text-muted">
                     Mínimo: 1 minuto | Máximo: 10,080 minutos (1 semana)

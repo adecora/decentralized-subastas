@@ -2,6 +2,7 @@ import { decodeError } from "@ubiquity-os/ethers-decode-error"
 import { ethers } from "ethers"
 import { useEffect, useState } from "react"
 import { useBlockchain } from "@/context/BlockchainContext"
+import { checkIsActive } from "@/utils/utils"
 
 import Alert from "react-bootstrap/Alert"
 import Button from "react-bootstrap/Button"
@@ -13,6 +14,7 @@ export default function Home() {
   const [auctions, setAuctions] = useState([])
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [statusFilter, setStatusFilter] = useState("all")
 
   const { auctionContract, isLoading } = useBlockchain()
 
@@ -47,17 +49,25 @@ export default function Home() {
       //   {
       //       "type": "BigNumber",
       //       "hex": "0x00"
-      //   }
+      //   },
+      //   0
       // ]
+      const statusMap = {
+        0: "Active",
+        1: "Completed",
+        2: "Withdraw",
+      }
+
       const _auctions = []
       for (const auction of response) {
         _auctions.push({
           auctionId: auction[0].toNumber(),
-          creator: auction[1].toString(),
+          creator: auction[1],
           description: auction[2],
           deadline: auction[3].toNumber(),
-          highestBidder: auction[4].toString(),
+          highestBidder: auction[4],
           highestBid: ethers.utils.formatEther(auction[5]),
+          status: statusMap[auction[6]] || "Unknown",
         })
       }
 
@@ -103,7 +113,7 @@ export default function Home() {
   async function refund(auction) {
     if (
       !confirm(
-        `¿Estás seguro de que deseas solicitar reembolso de la subasta #${auction.auctionId}: "${auction.description}"?`,
+        `¿Estás seguro de que deseas solicitar el reembolso de la subasta #${auction.auctionId}: "${auction.description}"?`,
       )
     ) {
       return
@@ -120,7 +130,7 @@ export default function Home() {
       setSuccess("Reembolso procesado exitosamente")
       await getAuctions()
 
-      setTimeout(() => setSuccessMessage(null), 5000)
+      setTimeout(() => setSuccess(null), 5000)
     } catch (err) {
       const { error } = decodeError(err)
       console.error(`Revert operation: ${error}`)
@@ -141,10 +151,74 @@ export default function Home() {
     }
   }
 
+  async function receipt(auction) {
+    if (
+      !confirm(
+        `¿Estás seguro de que deseas confirmar la entrega de: "${auction.description}" (subasta #${auction.auctionId})?`,
+      )
+    ) {
+      return
+    }
+
+    try {
+      const tx = await auctionContract.receipt(auction.auctionId)
+      console.log("Transacción enviada:", tx.hash)
+
+      const response = await tx.wait()
+      console.log("Transacción confirmada:", response)
+
+      setSuccess("Entrega confirmada correctamente")
+      await getAuctions()
+
+      setTimeout(() => setSuccess(null), 5000)
+    } catch (err) {
+      const { error } = decodeError(err)
+      console.error(`Revert operation: ${error}`)
+      setError(`Error: ${error}`)
+    }
+  }
+
+  async function auctionWithdraw(auction) {
+    if (
+      !confirm(
+        `¿Estás seguro de que deseas solicitar el cobro de la subasta #${auction.auctionId}: "${auction.description}"?`,
+      )
+    ) {
+      return
+    }
+
+    try {
+      const tx = await auctionContract.auctionWithdraw(auction.auctionId)
+      console.log("Transacción enviada:", tx.hash)
+
+      const response = await tx.wait()
+      console.log("Transacción confirmada:", response)
+
+      // TODO: Recuperar valor del cobro
+      setSuccess("Cobro procesado exitosamente")
+      await getAuctions()
+
+      setTimeout(() => setSuccess(null), 5000)
+    } catch (err) {
+      const { error } = decodeError(err)
+      console.error(`Revert operation: ${error}`)
+      setError(`Error: ${error}`)
+    }
+  }
+
+  const filteredAuctions = (() => {
+    if (statusFilter === "all") return auctions
+    if (statusFilter === "active")
+      return auctions.filter((a) => checkIsActive(a.deadline))
+    if (statusFilter === "finished")
+      return auctions.filter((a) => !checkIsActive(a.deadline))
+    return auctions.filter((a) => a.status === statusFilter)
+  })()
+
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Subastas Activas</h1>
+        <h1>Subastas</h1>
         <Button
           variant="outline-primary"
           onClick={() => {
@@ -168,12 +242,51 @@ export default function Home() {
         </Alert>
       )}
 
+      <div className="mb-4 d-flex gap-2 flex-wrap">
+        <Button
+          variant={statusFilter === "all" ? "primary" : "outline-primary"}
+          onClick={() => setStatusFilter("all")}
+        >
+          Todas ({auctions.length})
+        </Button>
+        <Button
+          variant={statusFilter === "active" ? "success" : "outline-success"}
+          onClick={() => setStatusFilter("active")}
+        >
+          Activas ({auctions.filter((a) => checkIsActive(a.deadline)).length})
+        </Button>
+        <Button
+          variant={statusFilter === "finished" ? "danger" : "outline-danger"}
+          onClick={() => setStatusFilter("finished")}
+        >
+          Finalizadas (
+          {auctions.filter((a) => !checkIsActive(a.deadline)).length})
+        </Button>
+        <Button
+          variant={
+            statusFilter === "Completed" ? "secondary" : "outline-secondary"
+          }
+          onClick={() => setStatusFilter("Completed")}
+        >
+          Completadas ({auctions.filter((a) => a.status === "Completed").length}
+          )
+        </Button>
+        <Button
+          variant={statusFilter === "Withdraw" ? "info" : "outline-info"}
+          onClick={() => setStatusFilter("Withdraw")}
+        >
+          Cobradas ({auctions.filter((a) => a.status === "Withdraw").length})
+        </Button>
+      </div>
+
       <AuctionList
-        auctions={auctions}
+        auctions={filteredAuctions}
         isLoading={isLoading}
         onBind={bid}
         onRefund={refund}
         onViewWinner={getWinner}
+        onReceipt={receipt}
+        onWithdraw={auctionWithdraw}
       />
 
       <BidModal

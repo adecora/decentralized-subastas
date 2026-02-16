@@ -11,6 +11,8 @@ export default function AuctionList({
   onBind,
   onRefund,
   onViewWinner,
+  onReceipt,
+  onWithdraw,
 }) {
   if (isLoading) {
     return (
@@ -51,6 +53,8 @@ export default function AuctionList({
               onBind={onBind}
               onRefund={onRefund}
               onViewWinner={onViewWinner}
+              onReceipt={onReceipt}
+              onWithdraw={onWithdraw}
             />
           </Col>
         ))}

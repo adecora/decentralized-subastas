@@ -14,6 +14,8 @@ export default function AuctionCard({
   onBind,
   onRefund,
   onViewWinner,
+  onReceipt,
+  onWithdraw,
 }) {
   const [timeRemaining, setTimeRemaining] = useState("")
   const [isActive, setIsActive] = useState(true)
@@ -44,7 +46,7 @@ export default function AuctionCard({
 
   return (
     <>
-      <Card className="h-100 shadow-sm">
+      <Card className="h-100 shadow-sm" data-status={auction.status}>
         <Card.Body>
           <div className="d-flex justify-content-between align-items-start mb-2">
             <Card.Title className="mb-0">{auction.description}</Card.Title>
@@ -100,6 +102,19 @@ export default function AuctionCard({
                 <Button variant="warning" onClick={() => onRefund(auction)}>
                   Solicitar Reembolso
                 </Button>
+                {auction.status == "Active" && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => onReceipt(auction)}
+                  >
+                    Confirmar entrega
+                  </Button>
+                )}
+                {auction.status == "Completed" && (
+                  <Button variant="primary" onClick={() => onWithdraw(auction)}>
+                    Solicitar cobro
+                  </Button>
+                )}
               </>
             )}
           </div>
