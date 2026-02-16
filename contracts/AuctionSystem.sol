@@ -88,7 +88,6 @@ contract AuctionSystem {
 
         require(_auctionId > 0 && _auctionId <= auctionCount, "La subasta no existe.");
         require(block.timestamp > auction.deadline, "La subasta no ha terminado.");
-        require(auction.highestBidder != address(0), "Nadie ha pujado en esta subasta.");
 
         return auction.highestBidder;
     }

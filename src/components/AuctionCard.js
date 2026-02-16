@@ -92,7 +92,7 @@ export default function AuctionCard({
               <>
                 <Button
                   variant="info"
-                  onClick={() => onViewWinner(auction.auctionId)}
+                  onClick={() => onViewWinner(auction)}
                   className="mb-2"
                 >
                   Ver Ganador

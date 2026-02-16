@@ -7,6 +7,7 @@ import Alert from "react-bootstrap/Alert"
 import Button from "react-bootstrap/Button"
 import AuctionList from "@/components/AuctionList"
 import BidModal from "@/components/BidModal"
+import WinnerModal from "@/components/WinnerModal"
 
 export default function Home() {
   const [auctions, setAuctions] = useState([])
@@ -17,7 +18,9 @@ export default function Home() {
 
   // Estado para modales
   const [showBidModal, setShowBidModal] = useState(false)
+  const [showWinnerModal, setShowWinnerModal] = useState(false)
   const [selectedAuction, setSelectedAuction] = useState(null)
+  const [winner, setWinner] = useState(null)
 
   useEffect(() => {
     if (auctionContract) {
@@ -125,8 +128,17 @@ export default function Home() {
     }
   }
 
-  async function getWinner(auctionId) {
-    alert(`GetWinner on ${auctionId}`)
+  async function getWinner(auction) {
+    try {
+      setSelectedAuction(auction)
+      const winnerAddress = await auctionContract.getWinner(auction.auctionId)
+      setWinner(winnerAddress)
+      setShowWinnerModal(true)
+    } catch (err) {
+      const { error } = decodeError(err)
+      console.error(`Revert operation: ${error}`)
+      setError(`Error: ${error}`)
+    }
   }
 
   return (
@@ -169,6 +181,13 @@ export default function Home() {
         auction={selectedAuction}
         onClose={() => setShowBidModal(false)}
         onSubmit={handleBidSubmit}
+      />
+
+      <WinnerModal
+        show={showWinnerModal}
+        auction={selectedAuction}
+        winner={winner}
+        onClose={() => setShowWinnerModal(false)}
       />
     </>
   )
