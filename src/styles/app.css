@@ -1,29 +1,48 @@
-footer {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  margin: 3rem 0;
-
-  & a svg {
-    position: relative;
-    top: 4px;
-    height: 1.25em;
-  }
+:root {
+  --bs-body-bg: #f8f9fa;
 }
 
-@media (max-width: 1024px) {
-  footer {
-    z-index: -1;
-    position: relative;
-    margin: 0;
-    padding: 2em 0;
-  }
+[data-bs-theme="dark"] {
+  --bs-body-bg: #212529;
 }
 
-@media (max-width: 540px) {
-  footer {
-    padding: 0 0 2em 0;
-  }
+body {
+  min-height: 100vh;
+  background-color: var(--bs-body-bg);
+}
+
+/* Mejoras visuales para tarjetas */
+.card {
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Animación para badges */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Estilo para código de direcciones */
+code {
+  font-size: 0.875em;
+  word-break: break-all;
+}
+
+/* Loader personalizado */
+.spinner-border {
+  vertical-align: middle;
+}
+
+/* Transición suave para tema */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
