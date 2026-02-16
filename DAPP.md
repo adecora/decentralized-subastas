@@ -2,7 +2,7 @@
 
 ## Visión General
 
-La aplicación frontend es una **DApp (Aplicación Descentralizada)** construida con **Next.js** y **React** que permite a los usuarios interactuar con el contrato inteligente `AuctionSystem.sol` desplegado en **BSC Testnet**. Utiliza **MetaMask** para la autenticación y firma de transacciones, y **Bootstrap** para la interfaz de usuario.
+La [aplicación frontend es una **DApp (Aplicación Descentralizada)**](https://subastas-blockchain-dapp.web.app/) construida con **Next.js** y **React** que permite a los usuarios interactuar con el contrato inteligente `AuctionSystem.sol` desplegado en **BSC Testnet**. Utiliza **MetaMask** para la autenticación y firma de transacciones, y **Bootstrap** para la interfaz de usuario.
 
 ---
 

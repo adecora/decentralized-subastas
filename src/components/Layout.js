@@ -24,8 +24,14 @@ export default function Layout({ children }) {
           content="Sistema descentralizado de subastas, desplegado en BSC Tesnet"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://example.com" />
-        <meta property="og:image" content="https://example.com/preview.png" />
+        <meta
+          property="og:url"
+          content="https://subastas-blockchain-dapp.web.app/"
+        />
+        <meta
+          property="og:image"
+          content="https://subastas-blockchain-dapp.web.app/preview.png"
+        />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -36,7 +42,10 @@ export default function Layout({ children }) {
           name="twitter:description"
           content="Sistema descentralizado de subastas, desplegado en BSC Tesnet"
         />
-        <meta name="twitter:image" content="https://example.com/preview.png" />
+        <meta
+          name="twitter:image"
+          content="https://subastas-blockchain-dapp.web.app/preview.png"
+        />
         <meta name="twitter:creator" content="@Alexinho_Cora" />
       </Head>
       <Navbar />

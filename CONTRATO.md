@@ -2,7 +2,7 @@
 
 ## Visión General
 
-El contrato `AuctionSystem.sol` es un **sistema descentralizado** que gestiona múltiples subastas con ciclo de vida completo: creación, pujas, finalización, entrega confirmada y cobro. Todas las subastas comparten el mismo contrato pero mantienen sus datos y estados independientes.
+El [contrato `AuctionSystem.sol` es un **sistema descentralizado**](https://testnet.bscscan.com/address/0x79d56F8f0866d8E42F4f3B2e0dd59e5B21c5960C) que gestiona múltiples subastas con ciclo de vida completo: creación, pujas, finalización, entrega confirmada y cobro. Todas las subastas comparten el mismo contrato pero mantienen sus datos y estados independientes.
 
 ---
 
