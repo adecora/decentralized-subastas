@@ -1,3 +1,13 @@
+export const MIN_BID = "0.01"
+
+export function formatBNB(value) {
+  const num = Number(value)
+  if (isNaN(num)) return "0 BNB"
+  if (num === 0) return "Sin pujas"
+  if (num < 0.001) return "< 0.001 BNB"
+  return `${num.toFixed(3)} BNB`
+}
+
 export function formatAddress(address) {
   if (address === "0x0000000000000000000000000000000000000000")
     return "Sin pujas"

@@ -6,12 +6,18 @@ import { useBlockchain } from "@/context/BlockchainContext"
 import Alert from "react-bootstrap/Alert"
 import Button from "react-bootstrap/Button"
 import AuctionList from "@/components/AuctionList"
+import BidModal from "@/components/BidModal"
 
 export default function Home() {
   const [auctions, setAuctions] = useState([])
   const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
 
   const { auctionContract, isLoading } = useBlockchain()
+
+  // Estado para modales
+  const [showBidModal, setShowBidModal] = useState(false)
+  const [selectedAuction, setSelectedAuction] = useState(null)
 
   useEffect(() => {
     if (auctionContract) {
@@ -59,12 +65,64 @@ export default function Home() {
     }
   }
 
-  async function bid(auctionId) {
-    alert(`Bid on ${auctionId}`)
+  async function bid(auction) {
+    setSelectedAuction(auction)
+    setShowBidModal(true)
   }
 
-  async function refund(auctionId) {
-    alert(`Refund on ${auctionId}`)
+  async function handleBidSubmit(auctionId, amount) {
+    try {
+      if (!auctionContract) {
+        setError("Contrato no disponible. Por favor, conecta MetaMask.")
+        return
+      }
+
+      const tx = await auctionContract.bid(auctionId, {
+        // Convertir de ether a weis
+        value: ethers.utils.parseEther(amount.toString()),
+      })
+
+      console.log("Transacción enviada:", tx.hash)
+
+      const response = await tx.wait()
+      console.log("Transacción confirmada:", response)
+
+      setSuccess(`Puja realizada exitosamente: ${amount} BNB`)
+      await getAuctions()
+
+      setTimeout(() => setSuccess(null), 5000)
+    } catch (err) {
+      const { error } = decodeError(err)
+      throw error
+    }
+  }
+
+  async function refund(auction) {
+    if (
+      !confirm(
+        `¿Estás seguro de que deseas solicitar reembolso de la subasta #${auction.auctionId}: "${auction.description}"?`,
+      )
+    ) {
+      return
+    }
+
+    try {
+      const tx = await auctionContract.refund(auction.auctionId)
+      console.log("Transacción enviada:", tx.hash)
+
+      const response = await tx.wait()
+      console.log("Transacción confirmada:", response)
+
+      // TODO: Recuperar valor del refund
+      setSuccess("Reembolso procesado exitosamente")
+      await getAuctions()
+
+      setTimeout(() => setSuccessMessage(null), 5000)
+    } catch (err) {
+      const { error } = decodeError(err)
+      console.error(`Revert operation: ${error}`)
+      setError(`Error: ${error}`)
+    }
   }
 
   async function getWinner(auctionId) {
@@ -92,12 +150,25 @@ export default function Home() {
         </Alert>
       )}
 
+      {success && (
+        <Alert variant="success" dismissible onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      )}
+
       <AuctionList
         auctions={auctions}
         isLoading={isLoading}
         onBind={bid}
         onRefund={refund}
         onViewWinner={getWinner}
+      />
+
+      <BidModal
+        show={showBidModal}
+        auction={selectedAuction}
+        onClose={() => setShowBidModal(false)}
+        onSubmit={handleBidSubmit}
       />
     </>
   )

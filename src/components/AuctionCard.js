@@ -85,10 +85,7 @@ export default function AuctionCard({
 
           <div className="d-grid gap-2">
             {isActive ? (
-              <Button
-                variant="primary"
-                onClick={() => onBind(auction.auctionId)}
-              >
+              <Button variant="primary" onClick={() => onBind(auction)}>
                 Realizar Puja
               </Button>
             ) : (
@@ -100,10 +97,7 @@ export default function AuctionCard({
                 >
                   Ver Ganador
                 </Button>
-                <Button
-                  variant="warning"
-                  onClick={() => onRefund(auction.auctionId)}
-                >
+                <Button variant="warning" onClick={() => onRefund(auction)}>
                   Solicitar Reembolso
                 </Button>
               </>
